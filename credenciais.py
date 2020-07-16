@@ -1,7 +1,0 @@
-USUARIO = 'c111710'
-SENHA = 'Grace03'
-
-SERVER = 'SP7877SR021'
-DATABASE = '7854_1'
-USER = 'usr_7854'
-PASSWORD = '7854_usr_cetes'
