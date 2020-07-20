@@ -54,6 +54,10 @@ def capturar_dados_sifin():
         consulta = "CREATE TABLE [dbo].[TP_90003_04_TEMP_SAQUE_BB_BACEN_POR_BASE]([dtDataAtendimento] [date], [chSiglaTesouraria] [char](2), [vcNomeBase] [varchar](50), [vcTipoOperacao] [varchar](10), [vcTipoTransporte] [varchar](50), [dcValorTarifa] [decimal](17, 2), [chPrepostoInformado] [char](3), [dcValorCirculante] [decimal](17, 2), [dcValorDilacerado] [decimal](17, 2), [vcSituacao] [varchar](150), [vcCir] [varchar](50), [dtDataCaptura] [datetime])"
         cursor.execute(consulta)
         conexao_banco.commit()
+    else:
+        consulta = "TRUNCATE TABLE [dbo].[TP_90003_04_TEMP_SAQUE_BB_BACEN_POR_BASE]"
+        cursor.execute(consulta)
+        conexao_banco.commit()
 
     lista_tesourarias = ["TESOURARIA AL", "TESOURARIA AM", "TESOURARIA BA", "TESOURARIA BR", "TESOURARIA CE", "TESOURARIA ES", "TESOURARIA GO", "TESOURARIA JF", "TESOURARIA MA", "TESOURARIA MG", "TESOURARIA MS", "TESOURARIA MT", "TESOURARIA PA", "TESOURARIA PB", "TESOURARIA PE", "TESOURARIA PI", "TESOURARIA PR", "TESOURARIA RJ", "TESOURARIA RN", "TESOURARIA RS", "TESOURARIA SC", "TESOURARIA SE", "TESOURARIA SP", "TESOURARIA UB"]
     for dia in range(0, 11):
@@ -105,17 +109,30 @@ def capturar_dados_sifin():
                             cir = read(screen, 23, 23, 50).strip()
                             write(screen, 21, 8, 'N')
                     print(f"Data atendimento: {data_atendimento} - Sigla: {sigla_tesouraria} - Nome Base: {nome_base} - Operação: {operacao} - Tipo Transporte: {tipo_trasporte} - Tarifa: {tarifa} - Preposto Informado: {preposto_informado} - Valor Circulante: R$ {valor_circulante} - Valor Dilacerado: R$ {valor_dilacerado} - Situação: {situacao} - CIR: {cir}")
-                    while sigla_tesouraria != " " and nome_base != " " and operacao != " " and tipo_trasporte != " " and tarifa != " " and preposto_informado != " " and valor_circulante != " " and valor_dilacerado != " " and situacao != " " and cir != " ":
+                    if sigla_tesouraria != " " and nome_base != " " and operacao != " " and tipo_trasporte != " " and tarifa != " " and preposto_informado != " " and valor_circulante != " " and valor_dilacerado != " " and situacao != " " and cir != " ":
                         realiza_insert_banco(conexao_banco, cursor, data_atendimento, sigla_tesouraria, nome_base, operacao, tipo_trasporte, tarifa, preposto_informado, valor_circulante, valor_dilacerado, situacao, cir, data_hora_consulta)
                     write(screen, 21, 8, 'N')
-                write(screen, 6, 19, '.')
+                posicao = descobre_linha_coluna(screen)
+                write(screen, posicao[0], posicao[1], '.')
             else:
-                write(screen, 6, 19, '.')
+                posicao = descobre_linha_coluna(screen)
+                write(screen, posicao[0], posicao[1], '.')
 
     os.system("taskkill /f /im EXTRA.EXE")
     print("")
 
     escrever_cabecalho('FIM')
+
+
+def descobre_linha_coluna(screen):
+    lista_linha_coluna = []
+    posicao_tela = str(screen.oia)
+    lista_elementos_tela = posicao_tela.split(',')
+    linha = int(lista_elementos_tela[0][-3:])
+    coluna = int(lista_elementos_tela[1][:3])
+    lista_linha_coluna.append(linha)
+    lista_linha_coluna.append(coluna)
+    return lista_linha_coluna
 
 def realiza_insert_banco(conexao_banco, cursor, data_atendimento, sigla_tesouraria, nome_base, operacao, tipo_trasporte, tarifa, preposto_informado, valor_circulante, valor_dilacerado, situacao, cir, data_hora_consulta):
     consulta = """
